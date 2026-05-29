@@ -27,7 +27,7 @@ public:
         cout << "--------------------------" << endl;
     }
 
-    // Borrow book
+    // Borrow book (only if currently available)
     bool borrowBook() {
         if (availability) {
             availability = false;
@@ -36,9 +36,13 @@ public:
         return false;
     }
 
-    // Return book
-    void returnBook() {
-        availability = true;
+    // Return book (only if currently borrowed)
+    bool returnBook() {
+        if (!availability) {
+            availability = true;
+            return true;
+        }
+        return false;
     }
 
     // Get ISBN
@@ -56,6 +60,7 @@ int main() {
     Book library[5];
     string inputISBN;
     bool found;
+    int choice;
 
     // Initialize 5 books
     library[0].setBookDetails("The Great Gatsby", "F. Scott Fitzgerald", "111", true);
@@ -66,40 +71,83 @@ int main() {
 
     cout << "=== Community Library System ===" << endl;
 
-    while (true) {
-        cout << "\nAvailable Books in Library:\n" << endl;
+    // Menu loop: the menu is shown before AND after every option,
+    // and the librarian exits by choosing option 4.
+    do {
+        cout << "\n===== Library Menu =====" << endl;
+        cout << "1) Display Books" << endl;
+        cout << "2) Borrow Book" << endl;
+        cout << "3) Return Book" << endl;
+        cout << "4) Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
 
-        for (int i = 0; i < 5; i++) {
-            library[i].displayBookDetails();
-        }
-
-        cout << "Enter ISBN of the book you want to borrow (or 0 to exit): ";
-        cin >> inputISBN;
-
-        if (inputISBN == "0") {
-            cout << "Program terminated." << endl;
-            break;
-        }
-
-        found = false;
-
-        for (int i = 0; i < 5; i++) {
-            if (library[i].getISBN() == inputISBN) {
-                found = true;
-
-                if (library[i].borrowBook()) {
-                    cout << "Book borrowed successfully!" << endl;
-                } else {
-                    cout << "Error: Book is currently unavailable." << endl;
-                }
-                break;
+        if (choice == 1) {
+            cout << "\nBooks in Library:\n" << endl;
+            for (int i = 0; i < 5; i++) {
+                library[i].displayBookDetails();
             }
         }
 
-        if (!found) {
-            cout << "Error: Book with ISBN " << inputISBN << " not found." << endl;
+        else if (choice == 2) {
+            cout << "Enter ISBN of the book you want to borrow: ";
+            cin >> inputISBN;
+
+            found = false;
+
+            for (int i = 0; i < 5; i++) {
+                if (library[i].getISBN() == inputISBN) {
+                    found = true;
+
+                    if (library[i].borrowBook()) {
+                        cout << "Book borrowed successfully!" << endl;
+                    } else {
+                        cout << "Error: Book is currently unavailable." << endl;
+                    }
+
+                    break;
+                }
+            }
+
+            if (!found) {
+                cout << "Error: Book with ISBN " << inputISBN << " not found." << endl;
+            }
         }
-    }
+
+        else if (choice == 3) {
+            cout << "Enter ISBN of the book you want to return: ";
+            cin >> inputISBN;
+
+            found = false;
+
+            for (int i = 0; i < 5; i++) {
+                if (library[i].getISBN() == inputISBN) {
+                    found = true;
+
+                    if (library[i].returnBook()) {
+                        cout << "Book returned successfully!" << endl;
+                    } else {
+                        cout << "Error: This book is already available." << endl;
+                    }
+
+                    break;
+                }
+            }
+
+            if (!found) {
+                cout << "Error: Book with ISBN " << inputISBN << " not found." << endl;
+            }
+        }
+
+        else if (choice == 4) {
+            cout << "Program exited successfully." << endl;
+        }
+
+        else {
+            cout << "Invalid option. Please try again." << endl;
+        }
+
+    } while (choice != 4);
 
     return 0;
 }
